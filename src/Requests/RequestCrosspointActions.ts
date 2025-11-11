@@ -14,12 +14,16 @@ class RequestCrosspointActions extends HCIRequest {
     constructor(actions: CrosspointAction[] = [], urgent: boolean = false, responseID?: number) {
         // Create the payload buffer - this is just the middle part
         const payload = RequestCrosspointActions.createPayload(actions);
-        
+
         // Call parent constructor with Message ID 17 (0x0011)
         super(0x0011, payload, urgent, responseID);
-        
+
         // Set version to 2 for HCIv2 (parent's getRequest() will handle the formatting)
         this.Version = 2;
+
+        // Set protocol version to 2 for RequestCrosspointActions
+        this.ProtocolVersion = 2;
+
         this.Actions = actions;
     }
 
@@ -27,16 +31,16 @@ class RequestCrosspointActions extends HCIRequest {
         // Count (2 bytes): number of actions
         const countBuffer = Buffer.allocUnsafe(2);
         countBuffer.writeUInt16BE(actions.length, 0);
-        
+
         // Action Data - each action is 10 bytes (Action Type + 4 words)
         const actionDataBuffers: Buffer[] = [];
-        
+
         for (const action of actions) {
             // Validate port numbers
             if (!RequestCrosspointActions.validatePorts(action.sourcePort, action.destinationPort)) {
                 throw new Error(`Invalid port numbers: source=${action.sourcePort}, dest=${action.destinationPort}`);
             }
-            
+
             // Validate priority
             if (action.priority < 0 || action.priority > 7) {
                 throw new Error(`Priority must be 0-7, got ${action.priority}`);
@@ -45,10 +49,10 @@ class RequestCrosspointActions extends HCIRequest {
             // Action Type (2 bytes): set to 0x0001
             const actionTypeBuffer = Buffer.allocUnsafe(2);
             actionTypeBuffer.writeUInt16BE(0x0001, 0);
-            
+
             // Action: 4 x 16 bit words (8 bytes total)
             const actionBuffer = Buffer.allocUnsafe(8);
-            
+
             // Word 0
             let word0 = 0;
             // bit 0: direction (0 = delete, 1 = add)
@@ -61,26 +65,26 @@ class RequestCrosspointActions extends HCIRequest {
             // bit 10: set to 1
             word0 |= 0x0400;
             // bits 11,12: source port number bits 8,9
-            word0 |= ((action.sourcePort >> 8) & 0x03) << 11;
+            word0 |= ((action.sourcePort - 1 >> 8) & 0x03) << 11;
             // bit 13: set to 1
             word0 |= 0x2000;
             // bit 14: set to 0 (already 0)
             // bit 15: set to 0 (already 0)
-            
+
             actionBuffer.writeUInt16BE(word0, 0);
-            
+
             // Word 1
             let word1 = 0;
             // bits 0-7: destination port number bits 0-7
-            word1 |= action.destinationPort & 0xFF;
+            word1 |= action.destinationPort - 1 & 0xFF;
             // bits 8-15: source port number bits 0-7
-            word1 |= (action.sourcePort & 0xFF) << 8;
-            
+            word1 |= (action.sourcePort - 1 & 0xFF) << 8;
+
             actionBuffer.writeUInt16BE(word1, 2);
-            
+
             // Word 2: bits 0-15 set to 0
             actionBuffer.writeUInt16BE(0x0000, 4);
-            
+
             // Word 3
             let word3 = 0;
             // bit 0: set to 0 (already 0)
@@ -97,13 +101,13 @@ class RequestCrosspointActions extends HCIRequest {
             // bit 12: set to 0 (already 0)
             // bits 13-15: crosspoint priority
             word3 |= (action.priority & 0x07) << 13;
-            
+
             actionBuffer.writeUInt16BE(word3, 6);
-            
+
             // Combine Action Type + Action data
             actionDataBuffers.push(Buffer.concat([actionTypeBuffer, actionBuffer]));
         }
-        
+
         // Combine count + all action data
         const actionData = Buffer.concat(actionDataBuffers);
         return Buffer.concat([countBuffer, actionData]);
@@ -160,8 +164,8 @@ class RequestCrosspointActions extends HCIRequest {
 
     // Helper method to validate port numbers
     private static validatePorts(sourcePort: number, destinationPort: number): boolean {
-        return sourcePort >= 0 && sourcePort <= 1023 && 
-               destinationPort >= 0 && destinationPort <= 1023;
+        return sourcePort > 0 && sourcePort <= 1024 &&
+            destinationPort > 0 && destinationPort <= 1024;
     }
 
     // Get a description of all actions
@@ -180,7 +184,7 @@ class RequestCrosspointActions extends HCIRequest {
     // Helper method to display the request details
     public toString(): string {
         return `RequestCrosspointActions - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
-               `Actions: ${this.Actions.length}`;
+            `Actions: ${this.Actions.length}`;
     }
 
     // Get payload size in bytes

@@ -1,12 +1,12 @@
 import HCIRequest from '../HCIRequest';
 
-class RequestCrosspointStatus extends HCIRequest {
+class RequestCrosspointLevelStatus extends HCIRequest {
     public Ports: number[];
 
     constructor(ports: number[] = [], urgent: boolean = false, responseID?: number) {
-        // Validate port count (1-495)
-        if (ports.length < 1 || ports.length > 495) {
-            throw new Error('Port count must be between 1 and 495');
+        // Validate port count (must have at least 1 port)
+        if (ports.length < 1) {
+            throw new Error('Must specify at least 1 port');
         }
 
         // Validate each port number (1-1024 for user, 0-1023 for matrix)
@@ -17,13 +17,17 @@ class RequestCrosspointStatus extends HCIRequest {
         }
 
         // Create the payload buffer - this is just the middle part
-        const payload = RequestCrosspointStatus.createPayload(ports);
+        const payload = RequestCrosspointLevelStatus.createPayload(ports);
 
-        // Call parent constructor with Message ID 13 (0x000D)
-        super(0x000D, payload, urgent, responseID);
+        // Call parent constructor with Message ID 39 (0x0027)
+        super(0x0027, payload, urgent, responseID);
 
         // Set version to 2 for HCIv2 (parent's getRequest() will handle the formatting)
-        this.Version = 2;
+        this.HCIVersion = 2;
+
+        // Set protocol version to 1 for RequestCrosspointLevelStatus
+        this.ProtocolVersion = 1;
+
         this.Ports = [...ports]; // Create a copy of the array
     }
 
@@ -53,10 +57,6 @@ class RequestCrosspointStatus extends HCIRequest {
             throw new Error(`Port number must be between 1 and 1024, got ${port}`);
         }
 
-        if (this.Ports.length >= 495) {
-            throw new Error('Cannot add more ports - maximum of 495 ports allowed');
-        }
-
         // Avoid duplicates
         if (!this.Ports.includes(port)) {
             this.Ports.push(port);
@@ -83,8 +83,8 @@ class RequestCrosspointStatus extends HCIRequest {
 
     // Clear all ports and set new ones
     public setPorts(ports: number[]): void {
-        if (ports.length < 1 || ports.length > 495) {
-            throw new Error('Port count must be between 1 and 495');
+        if (ports.length < 1) {
+            throw new Error('Must specify at least 1 port');
         }
 
         // Validate each port
@@ -105,14 +105,9 @@ class RequestCrosspointStatus extends HCIRequest {
         }
     }
 
-    // Clear all ports (but ensure at least one remains)
-    public clearPorts(): void {
-        throw new Error('Cannot clear all ports - must have at least 1 port');
-    }
-
     private updatePayload(): void {
         // Update the Data buffer with new ports
-        this.Data = RequestCrosspointStatus.createPayload(this.Ports);
+        this.Data = RequestCrosspointLevelStatus.createPayload(this.Ports);
     }
 
     // Get unique ports (remove duplicates)
@@ -141,7 +136,7 @@ class RequestCrosspointStatus extends HCIRequest {
             ? `[${this.Ports.join(', ')}]`
             : `[${this.Ports.slice(0, 10).join(', ')}, ...and ${this.Ports.length - 10} more]`;
 
-        return `RequestCrosspointStatus - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
+        return `RequestCrosspointLevelStatus - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
             `Port Count: ${this.Ports.length}, Ports: ${portList}`;
     }
 
@@ -166,7 +161,7 @@ class RequestCrosspointStatus extends HCIRequest {
     }
 
     // Static helper to create a request for a range of ports
-    public static forPortRange(startPort: number, endPort: number, urgent: boolean = false): RequestCrosspointStatus {
+    public static forPortRange(startPort: number, endPort: number, urgent: boolean = false): RequestCrosspointLevelStatus {
         if (startPort > endPort) {
             throw new Error('Start port must be <= end port');
         }
@@ -176,13 +171,18 @@ class RequestCrosspointStatus extends HCIRequest {
             ports.push(port);
         }
 
-        return new RequestCrosspointStatus(ports, urgent);
+        return new RequestCrosspointLevelStatus(ports, urgent);
     }
 
     // Static helper to create a request for specific ports
-    public static forPorts(ports: number[], urgent: boolean = false): RequestCrosspointStatus {
-        return new RequestCrosspointStatus(ports, urgent);
+    public static forPorts(ports: number[], urgent: boolean = false): RequestCrosspointLevelStatus {
+        return new RequestCrosspointLevelStatus(ports, urgent);
+    }
+
+    // Static helper to create a request for a single port
+    public static forSinglePort(port: number, urgent: boolean = false): RequestCrosspointLevelStatus {
+        return new RequestCrosspointLevelStatus([port], urgent);
     }
 }
 
-export default RequestCrosspointStatus;
+export default RequestCrosspointLevelStatus;

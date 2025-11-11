@@ -24,11 +24,10 @@
   "author": "Erik Devane",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "ts-node": "^10.9.0"
+    "@types/node": "^20.19.24",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
   },
-  "dependencies": {},
   "engines": {
     "node": ">=16.0.0"
   },

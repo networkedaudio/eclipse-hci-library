@@ -1,98 +1,126 @@
 import { ReplyConferenceStatus } from './Responses/ReplyConferenceStatus';
 import { ReplyCrosspointStatus } from './Responses/ReplyCrosspointStatus';
+import { ReplyCrosspointLevelStatus } from './Responses/ReplyCrosspointLevelStatus';
 
-class ProcessHCI {
+class HCIResponse {
     public static handleMessageByID(
-        messageID: number, 
-        flags: any, 
-        payload: Buffer, 
-        hciVersion: string, 
+        messageID: number,
+        flags: any,
+        payload: Buffer,
+        hciVersion: string,
         protocolVersion: number | null,
         eclipseHCI?: any
     ): void {
         // Handle different message types based on messageID and HCI version
-        console.log(`Processing ${hciVersion} message ID: 0x${messageID.toString(16).padStart(4, '0')}`);
+        this.writeDebug(eclipseHCI, `Processing ${hciVersion} message ID: 0x${messageID.toString(16).padStart(4, '0')}`);
         if (protocolVersion !== null) {
-            console.log(`Protocol Version: ${protocolVersion}`);
+            this.writeDebug(eclipseHCI, `Protocol Version: ${protocolVersion}`);
         }
 
-        switch(protocolVersion){
-            case 1:
+        switch (hciVersion) {
+            case 'HCIv1':
                 switch (messageID) {
                     case 0x0001:
-                        console.log('Handling Broadcast Message');
+                        this.writeDebug(eclipseHCI, 'Handling Broadcast Message');
                         this.parseBroadcastMessageV1(payload, eclipseHCI);
                         break;
                     default:
-                        console.log(`Unknown message ID: 0x${messageID.toString(16).padStart(4, '0')}`);
+                        this.writeDebug(eclipseHCI, `Unknown message ID: 0x${messageID.toString(16).padStart(4, '0')}`);
                         break;
                 }
                 break;
-                
-            case 2:
-                console.log('Handling protocol version 2 specifics');
+
+            case "HCIv2":
+                this.writeDebug(eclipseHCI, 'Handling protocol version 2 specifics');
                 switch (messageID) {
                     case 0x0001:
-                        console.log('Handling Protocol v2 Broadcast Message');
-                        console.log(`Payload as text:`, payload.toString());
+                        this.writeDebug(eclipseHCI, 'Handling Protocol v2 Broadcast Message');
+                        this.writeDebug(eclipseHCI, `Payload as text:`, payload.toString());
                         break;
                     case 0x000E: // Crosspoint Status Reply
-                        console.log('Handling Crosspoint Status Reply');
+                        this.writeDebug(eclipseHCI, 'Handling Crosspoint Status Reply');
                         this.parseCrosspointStatusReply(payload, eclipseHCI);
+
                         break;
                     case 0x0014: // Conference Status Reply
-                        console.log('Handling Conference Status Reply');
+                        this.writeDebug(eclipseHCI, 'Handling Conference Status Reply');
                         this.parseConferenceStatusReply(payload, eclipseHCI);
                         break;
+                    case 0x0028: // Crosspoint Level Status Reply
+                        this.writeDebug(eclipseHCI, 'Handling Crosspoint Level Status Reply');
+                        this.parseCrosspointLevelStatusReply(payload, eclipseHCI);
+                        break;
                     default:
-                        console.log(`Unknown protocol v2 message ID: 0x${messageID.toString(16).padStart(4, '0')}`);
+                        this.writeDebug(eclipseHCI, `Unknown protocol v2 message ID: 0x${messageID.toString(16).padStart(4, '0')}`);
                         break;
                 }
                 break;
-                
+
             case null:
                 // HCIv1 messages (no protocol version)
                 switch (messageID) {
                     case 0x0001:
-                        console.log('Handling HCIv1 Broadcast Message');
-                        console.log(`Payload as text:`, payload.toString());
+                        this.writeDebug(eclipseHCI, 'Handling HCIv1 Broadcast Message');
+                        this.writeDebug(eclipseHCI, `Payload as text:`, payload.toString());
                         break;
                     default:
-                        console.log(`Unknown HCIv1 message ID: 0x${messageID.toString(16).padStart(4, '0')}`);
+                        this.writeDebug(eclipseHCI, `Unknown HCIv1 message ID: 0x${messageID.toString(16).padStart(4, '0')}`);
                         break;
                 }
                 break;
-                
+
             default:
-                console.log(`Unsupported protocol version: ${protocolVersion}`);
+                this.writeDebug(eclipseHCI, `Unsupported protocol version: ${protocolVersion}`);
                 break;
+        }
+    }
+
+    // Debug method that only outputs when showDebug is true on the EclipseHCI instance
+    private static writeDebug(eclipseHCI: any, message: string, ...args: any[]): void {
+        if (eclipseHCI && eclipseHCI.showDebug) {
+            console.log(message, ...args);
         }
     }
 
     private static parseCrosspointStatusReply(payload: Buffer, eclipseHCI?: any): void {
         const crosspointStatus = ReplyCrosspointStatus.parse(payload);
-        
+
+        console.log("Crosspoint Status Parsed as:", crosspointStatus);
         if (crosspointStatus) {
             // Display the parsed crosspoint status
             ReplyCrosspointStatus.displayCrosspointStatus(crosspointStatus);
-            
             // Emit event if EclipseHCI instance is provided
             if (eclipseHCI && typeof eclipseHCI.emit === 'function') {
-                eclipseHCI.emit('crosspointStatus', crosspointStatus);
+
+                eclipseHCI.emit('onReplyCrosspointStatus', crosspointStatus);
             }
         }
     }
 
     private static parseConferenceStatusReply(payload: Buffer, eclipseHCI?: any): void {
         const conferenceStatus = ReplyConferenceStatus.parse(payload);
-        
+
         if (conferenceStatus) {
             // Display the parsed conference status
             ReplyConferenceStatus.displayConferenceStatus(conferenceStatus);
-            
+
             // Emit event if EclipseHCI instance is provided
             if (eclipseHCI && typeof eclipseHCI.emit === 'function') {
                 eclipseHCI.emit('conferenceStatus', conferenceStatus);
+            }
+        }
+    }
+
+    private static parseCrosspointLevelStatusReply(payload: Buffer, eclipseHCI?: any): void {
+        const crosspointLevelStatus = ReplyCrosspointLevelStatus.parse(payload);
+
+        if (crosspointLevelStatus) {
+            // Display the parsed crosspoint level status
+            ReplyCrosspointLevelStatus.displayCrosspointLevelStatus(crosspointLevelStatus);
+
+            // Emit event if EclipseHCI instance is provided
+            if (eclipseHCI && typeof eclipseHCI.emit === 'function') {
+                eclipseHCI.emit('onReplyCrosspointLevelStatus', crosspointLevelStatus);
             }
         }
     }
@@ -115,7 +143,7 @@ class ProcessHCI {
             'Debug',            // 4
             'Log to disk'       // 5
         ];
-        
+
         const className = classValue <= 5 ? classNames[classValue] : `Reserved (${classValue})`;
 
         // Parse Code (16-bit word)
@@ -128,13 +156,13 @@ class ProcessHCI {
         let text = '';
         if (payload.length > 8) {
             const textBytes = payload.subarray(8, Math.min(payload.length, 8 + 180));
-            
+
             // Find null terminator
             let nullIndex = textBytes.indexOf(0);
             if (nullIndex === -1) {
                 nullIndex = textBytes.length;
             }
-            
+
             text = textBytes.subarray(0, nullIndex).toString('utf8');
         }
 
@@ -158,13 +186,13 @@ class ProcessHCI {
         };
 
         // Display parsed information
-        console.log('=== Broadcast Message (Protocol v1) ===');
-        console.log(`Class: ${classValue} (${className})`);
-        console.log(`Code: 0x${code.toString(16).padStart(4, '0')} (${code})`);
-        console.log(`Reserved: ${reserved.toString('hex')}`);
-        console.log(`Text: "${text}"`);
-        console.log(`Text length: ${text.length} characters`);
-        console.log('=====================================');
+        this.writeDebug(eclipseHCI, '=== Broadcast Message (Protocol v1) ===');
+        this.writeDebug(eclipseHCI, `Class: ${classValue} (${className})`);
+        this.writeDebug(eclipseHCI, `Code: 0x${code.toString(16).padStart(4, '0')} (${code})`);
+        this.writeDebug(eclipseHCI, `Reserved: ${reserved.toString('hex')}`);
+        this.writeDebug(eclipseHCI, `Text: "${text}"`);
+        this.writeDebug(eclipseHCI, `Text length: ${text.length} characters`);
+        this.writeDebug(eclipseHCI, '=====================================');
 
         // Emit the event if EclipseHCI instance is provided
         if (eclipseHCI && typeof eclipseHCI.emitBroadcastMessage === 'function') {
@@ -173,4 +201,4 @@ class ProcessHCI {
     }
 }
 
-export default ProcessHCI;
+export default HCIResponse;

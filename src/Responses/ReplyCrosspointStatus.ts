@@ -1,11 +1,11 @@
 interface ConnectedPortData {
-    portNumber: number;        // 0-1023 (13 bits)
+    portNumber: number;        // 1-1024 (user-friendly, 1-indexed)
     isListener: boolean;       // bit 13
     isTalker: boolean;         // bit 14
 }
 
 interface MonitoredPortData {
-    portNumber: number;        // 0-1023 (13 bits)
+    portNumber: number;        // 1-1024 (user-friendly, 1-indexed)
     connectedPorts: ConnectedPortData[];
 }
 
@@ -27,6 +27,9 @@ class ReplyCrosspointStatus {
             return null;
         }
 
+        // Log the raw payload with 0x between bytes
+        console.log('Raw payload:', payload.toString('hex').replace(/../g, '0x$& ').trim());
+
         let offset = 0;
 
         // Count (2 bytes)
@@ -35,13 +38,13 @@ class ReplyCrosspointStatus {
 
         console.log(`Parsing crosspoint status with count: ${count}`);
 
+
         const monitoredPorts: MonitoredPortData[] = [];
 
         // Parse each monitored port and its connected ports
         for (let i = 0; i < count; i++) {
             if (offset + 2 > payload.length) {
-                console.error(`Insufficient data for monitored port ${i + 1}`);
-                return null;
+                continue; // Not enough data for another monitored port
             }
 
             // Read the monitored port data
@@ -55,8 +58,8 @@ class ReplyCrosspointStatus {
                 return null;
             }
 
-            // Extract monitored port number (bits 0-12)
-            const monitoredPortNumber = monitoredPortData & 0x1FFF;
+            // Extract monitored port number (bits 0-12) and convert from 0-indexed to 1-indexed
+            const monitoredPortNumber = (monitoredPortData & 0x1FFF) + 1;
 
             // Validate bits 13,14 are 0
             const bits13_14 = (monitoredPortData & 0x6000) >> 13;
@@ -68,14 +71,14 @@ class ReplyCrosspointStatus {
 
             // Now read connected ports for this monitored port
             const connectedPorts: ConnectedPortData[] = [];
-            
+
             // Continue reading until we hit another monitored port or end of data
             while (offset + 2 <= payload.length) {
                 const nextPortData = payload.readUInt16BE(offset);
-                
+
                 // Check if this is a monitored port (bit 15 = 1) or connected port (bit 15 = 0)
                 const isNextMonitoredPort = (nextPortData & 0x8000) !== 0;
-                
+
                 if (isNextMonitoredPort) {
                     // This is the next monitored port, don't consume it
                     break;
@@ -84,8 +87,8 @@ class ReplyCrosspointStatus {
                 // This is a connected port, consume it
                 offset += 2;
 
-                // Extract connected port information
-                const connectedPortNumber = nextPortData & 0x1FFF;  // bits 0-12
+                // Extract connected port information and convert from 0-indexed to 1-indexed
+                const connectedPortNumber = (nextPortData & 0x1FFF) + 1;  // bits 0-12, +1 for user display
                 const isListener = (nextPortData & 0x2000) !== 0;   // bit 13
                 const isTalker = (nextPortData & 0x4000) !== 0;     // bit 14
 
@@ -103,6 +106,7 @@ class ReplyCrosspointStatus {
                 connectedPorts
             });
         }
+
 
         return {
             messageType: 'crosspointStatus',
@@ -144,7 +148,7 @@ class ReplyCrosspointStatus {
         console.log(`Monitored Ports: ${data.monitoredPorts.length}`);
         console.log(`Timestamp: ${data.timestamp}`);
         console.log('');
-        
+
         if (data.monitoredPorts.length > 0) {
             data.monitoredPorts.forEach((monitored, index) => {
                 console.log(`${index + 1}. Port ${monitored.portNumber}:`);
