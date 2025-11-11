@@ -1,0 +1,44 @@
+{
+  "name": "eclipse-hci-library",
+  "version": "1.0.0",
+  "description": "TypeScript library for Eclipse HCI (Host Control Interface) communication",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "test": "ts-node tests/test-conference-status.ts",
+    "test:crosspoint": "ts-node tests/test-crosspoint-status.ts",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean"
+  },
+  "keywords": [
+    "eclipse",
+    "hci",
+    "host-control-interface",
+    "typescript",
+    "communication",
+    "crosspoint",
+    "conference"
+  ],
+  "author": "Erik Devane",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/networkedaudio/eclipse-hci-library.git"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ]
+}
