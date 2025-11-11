@@ -50,6 +50,9 @@ async function testCrosspointLevel() {
                 if (currentLevel && originalLevel === null) {
                     // Step 1 complete - store original level
                     originalLevel = currentLevel.levelValue;
+                    if (originalLevel === undefined || originalLevel === null) {
+                        originalLevel = 0;
+                    }
                     const originalDB = LevelConversion.levelToDB(originalLevel);
                     console.log(`\n✓ Current level: ${originalLevel} (${LevelConversion.formatDB(originalDB)})`);
 

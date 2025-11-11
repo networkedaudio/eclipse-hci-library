@@ -1,7 +1,7 @@
 class HCIRequest {
     public RequestID: number;
     public ResponseID: number | null;
-    public Version: number = 2;
+    public HCIVersion: number = 2;
     public ProtocolVersion: number = 1;
     public Data: Buffer;
     public Urgent: boolean;
@@ -35,7 +35,7 @@ class HCIRequest {
 
         let messageBuffer: Buffer;
 
-        if (this.Version === 2) {
+        if (this.HCIVersion === 2) {
             // HCIv2 message structure:
             // Start (2) + Length (2) + MessageID (2) + Flags (1) + Preamble (4) + Protocol (1) + Data + End (2)
             const preamble = Buffer.from([0xAB, 0xBA, 0xCE, 0xDE]);

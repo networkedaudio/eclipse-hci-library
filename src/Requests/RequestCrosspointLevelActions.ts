@@ -108,23 +108,6 @@ class RequestCrosspointLevelActions extends HCIRequest {
         });
     }
 
-    // Convenience method to cut audio (set to CUT level)
-    public addCutAction(destinationPort: number, sourcePort: number): void {
-        this.addAction({
-            destinationPort,
-            sourcePort,
-            levelValue: LevelConversion.CUT
-        });
-    }
-
-    // Convenience method to set unity gain
-    public addUnityAction(destinationPort: number, sourcePort: number): void {
-        this.addAction({
-            destinationPort,
-            sourcePort,
-            levelValue: LevelConversion.UNITY
-        });
-    }
 
     private updatePayload(): void {
         // Update the Data buffer with new actions

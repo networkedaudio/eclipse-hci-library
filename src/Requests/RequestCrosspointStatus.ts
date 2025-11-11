@@ -23,7 +23,7 @@ class RequestCrosspointStatus extends HCIRequest {
         super(0x000D, payload, urgent, responseID);
 
         // Set version to 2 for HCIv2 (parent's getRequest() will handle the formatting)
-        this.Version = 2;
+        this.HCIVersion = 2;
         this.Ports = [...ports]; // Create a copy of the array
     }
 

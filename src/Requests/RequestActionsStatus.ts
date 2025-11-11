@@ -15,12 +15,12 @@ class RequestActionsStatus extends HCIRequest {
     constructor(actionType: number = 0, urgent: boolean = false, responseID?: number) {
         // Create the payload buffer - this is just the middle part
         const payload = RequestActionsStatus.createPayload(actionType);
-        
+
         // Call parent constructor with Message ID 15 (0x000F)
         super(0x000F, payload, urgent, responseID);
-        
+
         // Set version to 2 for HCIv2 (parent's getRequest() will handle the formatting)
-        this.Version = 2;
+        this.HCIVersion = 2;
         this.ActionType = actionType;
     }
 
@@ -28,14 +28,14 @@ class RequestActionsStatus extends HCIRequest {
         // This is just the payload part that goes after the HCI headers and before the terminator
         // Protocol Tag (4 bytes): 0xABBACEDE
         const protocolTag = Buffer.from([0xAB, 0xBA, 0xCE, 0xDE]);
-        
+
         // Protocol Schema (1 byte): set to 1
         const protocolSchema = Buffer.from([0x01]);
-        
+
         // Action type (2 bytes): 16-bit word
         const actionTypeBuffer = Buffer.allocUnsafe(2);
         actionTypeBuffer.writeUInt16BE(actionType, 0);
-        
+
         // Return just the payload data
         return Buffer.concat([protocolTag, protocolSchema, actionTypeBuffer]);
     }
@@ -91,7 +91,7 @@ class RequestActionsStatus extends HCIRequest {
     // Helper method to get a description of active actions
     public getActionDescription(): string {
         const actions: string[] = [];
-        
+
         if (this.isCrosspointActionSet()) {
             actions.push('Crosspoint');
         }
@@ -101,19 +101,19 @@ class RequestActionsStatus extends HCIRequest {
         if (this.isConferenceActionSet()) {
             actions.push('Conference');
         }
-        
+
         if (actions.length === 0) {
             return 'No actions set';
         }
-        
+
         return `Actions: ${actions.join(', ')}`;
     }
 
     // Helper method to display the request details
     public toString(): string {
         return `RequestActionsStatus - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
-               `Action Type: 0x${this.ActionType.toString(16).padStart(4, '0')} (${this.ActionType.toString(2).padStart(16, '0')}), ` +
-               `${this.getActionDescription()}`;
+            `Action Type: 0x${this.ActionType.toString(16).padStart(4, '0')} (${this.ActionType.toString(2).padStart(16, '0')}), ` +
+            `${this.getActionDescription()}`;
     }
 }
 

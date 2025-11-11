@@ -11,12 +11,12 @@ class RequestConferenceStatus extends HCIRequest {
 
         // Create the payload buffer - this is just the middle part
         const payload = RequestConferenceStatus.createPayload(conferenceNumber);
-        
+
         // Call parent constructor with Message ID 19 (0x0013)
         super(0x0013, payload, urgent, responseID);
-        
+
         // Set version to 2 for HCIv2 (parent's getRequest() will handle the formatting)
-        this.Version = 2;
+        this.HCIVersion = 2;
         this.ConferenceNumber = conferenceNumber;
     }
 
@@ -24,7 +24,7 @@ class RequestConferenceStatus extends HCIRequest {
         // Just the conference number (2 bytes): 16-bit word
         const conferenceNumberBuffer = Buffer.allocUnsafe(2);
         conferenceNumberBuffer.writeUInt16BE(conferenceNumber, 0);
-        
+
         // Return just the conference number - no protocol tag/schema needed
         return conferenceNumberBuffer;
     }
@@ -34,7 +34,7 @@ class RequestConferenceStatus extends HCIRequest {
         if (conferenceNumber < 0 || conferenceNumber > 65535) {
             throw new Error('Conference number must be between 0 and 65535');
         }
-        
+
         this.ConferenceNumber = conferenceNumber;
         this.updatePayload();
     }
@@ -47,7 +47,7 @@ class RequestConferenceStatus extends HCIRequest {
     // Helper method to display the request details
     public toString(): string {
         return `RequestConferenceStatus - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
-               `Conference Number: ${this.ConferenceNumber} (0x${this.ConferenceNumber.toString(16).padStart(4, '0')})`;
+            `Conference Number: ${this.ConferenceNumber} (0x${this.ConferenceNumber.toString(16).padStart(4, '0')})`;
     }
 
     // Get payload size in bytes
