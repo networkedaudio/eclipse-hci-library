@@ -14,6 +14,7 @@ import { ReplyLocallyAssignedKeys } from './Responses/ReplyLocallyAssignedKeys';
 import { ReplyAssignedKeys } from './Responses/ReplyAssignedKeys';
 import { ReplyCardInfo } from './Responses/ReplyCardInfo';
 import { ReplyConferenceAssignments } from './Responses/ReplyConferenceAssignments';
+import { ReplySetConfigMultipleKeys } from './Responses/ReplySetConfigMultipleKeys';
 
 class HCIResponse {
     public static handleMessageByID(
@@ -118,6 +119,10 @@ class HCIResponse {
                     case 0x00C6: // Conference Assignments Reply (Message ID 198)
                         this.writeDebug(eclipseHCI, 'Handling Conference Assignments Reply');
                         this.parseConferenceAssignmentsReply(payload, eclipseHCI);
+                        break;
+                    case 0x00CE: // Set Config Multiple Keys Reply (Message ID 206)
+                        this.writeDebug(eclipseHCI, 'Handling Set Config Multiple Keys Reply');
+                        this.parseSetConfigMultipleKeysReply(payload, hciVersion, protocolVersion, eclipseHCI);
                         break;
                     default:
                         this.writeDebug(eclipseHCI, `Unknown protocol v2 message ID: 0x${messageID.toString(16).padStart(4, '0')}`);
@@ -450,6 +455,25 @@ class HCIResponse {
             // Emit event if EclipseHCI instance is provided
             if (eclipseHCI && typeof eclipseHCI.emit === 'function') {
                 eclipseHCI.emit('onReplyConferenceAssignments', conferenceAssignments);
+            }
+        }
+    }
+
+    private static parseSetConfigMultipleKeysReply(
+        payload: Buffer,
+        hciVersion: string,
+        protocolVersion: number | null,
+        eclipseHCI?: any
+    ): void {
+        const reply = ReplySetConfigMultipleKeys.parse(payload, hciVersion, protocolVersion);
+
+        if (reply) {
+            // Display the parsed reply
+            ReplySetConfigMultipleKeys.displaySetConfigMultipleKeysReply(reply);
+
+            // Emit event if EclipseHCI instance is provided
+            if (eclipseHCI && typeof eclipseHCI.emit === 'function') {
+                eclipseHCI.emit('onReplySetConfigMultipleKeys', reply);
             }
         }
     }
