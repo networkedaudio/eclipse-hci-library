@@ -1,6 +1,6 @@
 
 // @ts-nocheck
-// import * as net from 'net';
+import * as net from 'net';
 import { EventEmitter } from 'events';
 import HCIRequest from './HCIRequest';
 import HCIResponse from './HCIResponse';
