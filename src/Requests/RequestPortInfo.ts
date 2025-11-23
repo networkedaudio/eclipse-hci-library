@@ -1,4 +1,4 @@
-// @ts-nocheck
+//@ts-nocheck
 import HCIRequest from '../HCIRequest';
 
 class RequestPortInfo extends HCIRequest {
@@ -56,7 +56,7 @@ class RequestPortInfo extends HCIRequest {
 
     // Static helper methods
     public static forSlot(slotNumber: number, urgent: boolean = false): RequestPortInfo {
-        return new RequestPortInfo(slotNumber, urgent);
+        return new RequestPortInfo(slotNumber, urgent, 1);
     }
 
     // Get slot identifier string

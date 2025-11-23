@@ -2,7 +2,9 @@
 // EclipseHCI.ts
 //  HCI v2 (Eclipse HX 12.0+), 32-bit session token fixed
 import { action, SingletonAction, KeyDownEvent, WillAppearEvent, WillDisappearEvent, streamDeck, DialRotateEvent } from "@elgato/streamdeck";
-
+import HCIRequest from './HCIRequest';
+import HCIResponse from './HCIResponse';
+import ProcessResponse from './Responses/ProcessResponse';
 import * as net from 'net';
 import { EventEmitter } from 'events';
 
@@ -61,8 +63,8 @@ export class EclipseHCI extends EventEmitter {
             address: options.address,
             port: options.port ?? 0,
             username: options.username ?? 'admin',
-            password: options.password ?? '',
-            rateLimitMs: options.rateLimitMs ?? 80,
+            password: options.password ?? 'admin',
+            rateLimitMs: options.rateLimitMs ?? 4001,
             reconnect: options.reconnect ?? true,
             reconnectDelayMs: options.reconnectDelayMs ?? 5000,
             showDebug: options.showDebug ?? true,
@@ -272,9 +274,36 @@ export class EclipseHCI extends EventEmitter {
 
     public getState(): ConnectionState { return this.state; }
     public getToken(): number { return this.sessionToken; }
+
+       // Queue management methods
+    public addToQueue(request: HCIRequest): void {
+        if (request.Urgent) {
+            // Find the position to insert urgent message (after other urgent messages)
+            let insertIndex = 0;
+            for (let i = 0; i < this.messageQueue.length; i++) {
+                if (this.messageQueue[i].Urgent) {
+                    insertIndex = i + 1;
+                } else {
+                    break;
+                }
+            }
+            this.messageQueue.splice(insertIndex, 0, request);
+            this.writeDebug(`Added urgent message (RequestID: ${request.RequestID}) to queue at position ${insertIndex}`);
+        } else {
+            this.messageQueue.push(request);
+            this.writeDebug(`Added normal message (RequestID: ${request.RequestID}) to queue`);
+        }
+
+        this.writeDebug(`Queue size: ${this.messageQueue.length}`);
+    }
+
+    public createAndQueueMessage(requestID: number, data: Buffer, urgent: boolean = false, responseID?: number): void {
+        const request = new HCIRequest(requestID, data, urgent, responseID);
+        this.addToQueue(request);
+    }
 }
 
-// Static helpers — 100% correct framing
+// Static helpers 
 export class HCI {
     static buildPacket(requestId: number, payload: Buffer): Buffer {
         const total = 4 + payload.length + 2;
@@ -294,6 +323,11 @@ export class HCI {
         data.copy(buf, 6);
         return buf;
     }
+
+
+ 
 }
+
+
 
 export default EclipseHCI;
