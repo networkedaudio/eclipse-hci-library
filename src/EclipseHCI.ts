@@ -64,7 +64,7 @@ export class EclipseHCI extends EventEmitter {
             port: options.port ?? 0,
             username: options.username ?? 'admin',
             password: options.password ?? 'admin',
-            rateLimitMs: options.rateLimitMs ?? 4001,
+            rateLimitMs: options.rateLimitMs ?? 80,
             reconnect: options.reconnect ?? true,
             reconnectDelayMs: options.reconnectDelayMs ?? 5000,
             showDebug: options.showDebug ?? true,
@@ -301,29 +301,7 @@ export class EclipseHCI extends EventEmitter {
         const request = new HCIRequest(requestID, data, urgent, responseID);
         this.addToQueue(request);
     }
-}
-
-// Static helpers 
-export class HCI {
-    static buildPacket(requestId: number, payload: Buffer): Buffer {
-        const total = 4 + payload.length + 2;
-        const buf = Buffer.alloc(total);
-        let off = 0;
-        EclipseHCI.START.copy(buf, off); off += 2;
-        buf.writeUInt16BE(total, off); off += 2;
-        payload.copy(buf, off); off += payload.length;
-        EclipseHCI.END.copy(buf, off);
-        return buf;
-    }
-
-    static v2Payload(requestId: number, data: Buffer, token: number): Buffer {
-        const buf = Buffer.alloc(6 + data.length);
-        buf.writeUInt16BE(requestId, 0);
-        buf.writeUInt32BE(token, 2);     // ← 32-bit token, correct offset!
-        data.copy(buf, 6);
-        return buf;
-    }
-    // Queue management methods
+     // Queue management methods
     public addToQueue(request: HCIRequest): void {
         if (request.Urgent) {
             // Find the position to insert urgent message (after other urgent messages)
@@ -455,6 +433,29 @@ export class HCI {
 
     getConnectedPort(): number | null {
         return this.port;
+    }
+}
+
+
+// Static helpers 
+export class HCI {
+    static buildPacket(requestId: number, payload: Buffer): Buffer {
+        const total = 4 + payload.length + 2;
+        const buf = Buffer.alloc(total);
+        let off = 0;
+        EclipseHCI.START.copy(buf, off); off += 2;
+        buf.writeUInt16BE(total, off); off += 2;
+        payload.copy(buf, off); off += payload.length;
+        EclipseHCI.END.copy(buf, off);
+        return buf;
+    }
+
+    static v2Payload(requestId: number, data: Buffer, token: number): Buffer {
+        const buf = Buffer.alloc(6 + data.length);
+        buf.writeUInt16BE(requestId, 0);
+        buf.writeUInt32BE(token, 2);     // ← 32-bit token, correct offset!
+        data.copy(buf, 6);
+        return buf;
     }
 }
 
