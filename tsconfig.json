@@ -35,8 +35,6 @@
   "include": [
     "src/**/*",
     "tests/test-crosspoint-action.ts",
-    "typed-buffer-patch.d.ts",
-    "src/types/typed-buffer-patch.d.ts"
   ],
   "exclude": [
     "node_modules",
