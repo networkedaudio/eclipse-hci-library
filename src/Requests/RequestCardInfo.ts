@@ -23,7 +23,7 @@ class RequestCardInfo extends HCIRequest {
         this.HCIVersion = 2;
 
         // Set protocol version to 1 for RequestCardInfo
-        this.ProtocolVersion = 2;
+        this.ProtocolVersion = 1;
 
         this.Slot = slot;
     }
