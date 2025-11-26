@@ -182,7 +182,7 @@ class RequestCrosspointActions extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         return `RequestCrosspointActions - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
             `Actions: ${this.Actions.length}`;
     }
