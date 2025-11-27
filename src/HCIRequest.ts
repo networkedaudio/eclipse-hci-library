@@ -41,7 +41,7 @@ class HCIRequest {
             // HCIv2 message structure:
             // Start (2) + Length (2) + MessageID (2) + Flags (1) + Preamble (4) + Protocol (1) + Data + End (2)
             const preamble = Buffer.from([0xAB, 0xBA, 0xCE, 0xDE]);
-            const protocol = Buffer.from([this.ProtocolVersion]); // Use ProtocolVersion property
+            const protocol = Buffer.from([0x01]); // Use ProtocolVersion property-BUG HERE- TODO determine why it fails with 2
 
             const headerSize = startBytes.length + 2 + 2 + 1 + preamble.length + protocol.length;
             //const headerSize = startBytes.length + 2 + 2 + 1 + 4 + 1 ;
@@ -82,7 +82,7 @@ class HCIRequest {
 
             // End bytes
             endBytes.copy(messageBuffer, offset);
-            
+
         } else {
             // HCIv1 message structure:
             // Start (2) + Length (2) + MessageID (2) + Flags (1) + Data + End (2)
