@@ -1,3 +1,4 @@
+import { off } from "process";
 
 class HCIRequest {
     public RequestID: number;
@@ -42,8 +43,8 @@ class HCIRequest {
             const preamble = Buffer.from([0xAB, 0xBA, 0xCE, 0xDE]);
             const protocol = Buffer.from([this.ProtocolVersion]); // Use ProtocolVersion property
 
-            //const headerSize = startBytes.length + 2 + 2 + 1 + preamble.length + protocol.length;
-            const headerSize = startBytes.length + 2 + 2 + 1 + 4 + 1
+            const headerSize = startBytes.length + 2 + 2 + 1 + preamble.length + protocol.length;
+            //const headerSize = startBytes.length + 2 + 2 + 1 + 4 + 1 ;
             const totalLength = headerSize + this.Data.length + endBytes.length;
 
             messageBuffer = Buffer.allocUnsafe(totalLength);
@@ -54,7 +55,7 @@ class HCIRequest {
             offset += startBytes.length;
 
             // Length field (total message length including start and end bytes)
-            messageBuffer.writeUInt16BE(totalLength, offset);
+            messageBuffer.writeUInt16BE(totalLength & 0xFFFF  , offset);
             offset += 2;
 
             // Message ID (RequestID)
@@ -67,11 +68,13 @@ class HCIRequest {
 
             // HCIv2 preamble
             preamble.copy(messageBuffer, offset);
-            offset += preamble.length;
+            offset += 4; //preamble.length;
 
             // Protocol version
-            protocol.copy(messageBuffer, offset);
-            offset += protocol.length;
+            messageBuffer.writeUInt8(protocol[0], offset);
+            //protocol.copy(messageBuffer, offset);
+            //offset += protocol.length;
+            offset += 1;
 
             // Data payload
             this.Data.copy(messageBuffer, offset);
@@ -79,7 +82,7 @@ class HCIRequest {
 
             // End bytes
             endBytes.copy(messageBuffer, offset);
-
+            
         } else {
             // HCIv1 message structure:
             // Start (2) + Length (2) + MessageID (2) + Flags (1) + Data + End (2)
