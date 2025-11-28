@@ -22,7 +22,7 @@ class RequestCrosspointActions extends HCIRequest {
         this.HCIVersion = 2;
 
         // Set protocol version to 2 for RequestCrosspointActions
-        this.ProtocolVersion = 2;
+        this.ProtocolVersion = 1; //= 2; TODO check, this makes calls fail on HCI-lite
 
         this.Actions = actions;
     }
