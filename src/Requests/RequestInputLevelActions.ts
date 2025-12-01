@@ -127,7 +127,7 @@ class RequestInputLevelActions extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         const actionList = this.Actions.length <= 3
             ? `[${this.Actions.map(a => `P${a.port}:${LevelConversion.formatDB(a.levelDB)}`).join(', ')}]`
             : `[${this.Actions.slice(0, 3).map(a => `P${a.port}:${LevelConversion.formatDB(a.levelDB)}`).join(', ')}, ...and ${this.Actions.length - 3} more]`;
