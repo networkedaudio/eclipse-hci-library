@@ -160,7 +160,7 @@ class RequestUnicodeAliasAdd extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         const aliasList = this.Aliases.length <= 3
             ? `[${this.Aliases.map(a => `S${a.system}P${a.port}:"${a.text}"`).join(', ')}]`
             : `[${this.Aliases.slice(0, 3).map(a => `S${a.system}P${a.port}:"${a.text}"`).join(', ')}, ...and ${this.Aliases.length - 3} more]`;

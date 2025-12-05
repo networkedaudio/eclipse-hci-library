@@ -110,7 +110,7 @@ class RequestActionsStatus extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         return `RequestActionsStatus - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
             `Action Type: 0x${this.ActionType.toString(16).padStart(4, '0')} (${this.ActionType.toString(2).padStart(16, '0')}), ` +
             `${this.getActionDescription()}`;

@@ -120,7 +120,7 @@ class RequestCrosspointLevelActions extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         const actionList = this.Actions.length <= 5
             ? `[${this.Actions.map(a => `${a.sourcePort}→${a.destinationPort}@${a.levelValue}`).join(', ')}]`
             : `[${this.Actions.slice(0, 5).map(a => `${a.sourcePort}→${a.destinationPort}@${a.levelValue}`).join(', ')}, ...and ${this.Actions.length - 5} more]`;

@@ -155,7 +155,7 @@ class RequestConferenceActions extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         return `RequestConferenceActions - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
             `Actions: ${this.Actions.length}, ${this.getActionsDescription()}`;
     }

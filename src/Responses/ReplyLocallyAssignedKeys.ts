@@ -273,7 +273,7 @@ class ReplyLocallyAssignedKeys {
         } else {
             console.log('No locally assigned keys found on this panel');
         }
-        console.log('=====================================');
+        console.log('displayLocallyAssignedKeys=====================================');
     }
 
     // Helper methods for filtering and analysis

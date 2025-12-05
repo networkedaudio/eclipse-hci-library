@@ -34,7 +34,7 @@
   },
   "include": [
     "src/**/*",
-    "tests/test-crosspoint-action.ts"
+    "tests/test-crosspoint-action.ts",
   ],
   "exclude": [
     "node_modules",

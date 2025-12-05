@@ -136,7 +136,7 @@ class RequestCrosspointStatus extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public overridetoString(): string {
         const portList = this.Ports.length <= 10
             ? `[${this.Ports.join(', ')}]`
             : `[${this.Ports.slice(0, 10).join(', ')}, ...and ${this.Ports.length - 10} more]`;

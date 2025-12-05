@@ -2,7 +2,7 @@ interface CardInfo {
     slotNumber: number;         // Derived from array position
     condition: CardCondition;   // Card condition (0-2)
     conditionName: string;      // Human-readable condition
-    cardType: CardType;         // Card type (0-127)
+    cardType: number;         // Card type (0-127)
     cardTypeName: string;       // Human-readable card type
     isSlot0: boolean;          // Whether this is slot 0 of the rack
     isPresent: boolean;        // Convenience property (condition !== 2)

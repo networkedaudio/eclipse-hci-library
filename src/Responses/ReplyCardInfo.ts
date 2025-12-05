@@ -35,6 +35,8 @@ interface CardInfoData {
     rawPayload: string;
 }
 
+
+
 class ReplyCardInfo {
     public static parse(payload: Buffer): CardInfoData | null {
         // Check minimum payload size

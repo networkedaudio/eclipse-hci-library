@@ -174,7 +174,7 @@ class RequestEHXControlActions extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         const actionList = this.Actions.length <= 3
             ? `[${this.Actions.map(a => `${a.direction}:C${a.cardNumber}P${a.pinNumber}:${a.mapType}`).join(', ')}]`
             : `[${this.Actions.slice(0, 3).map(a => `${a.direction}:C${a.cardNumber}P${a.pinNumber}:${a.mapType}`).join(', ')}, ...and ${this.Actions.length - 3} more]`;

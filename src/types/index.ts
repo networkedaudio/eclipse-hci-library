@@ -1,1 +1,1 @@
-export type ConnectionStatus = 'connected' | 'disconnected' | 'connecting' | 'disconnecting';
+export { EclipseHCI } from '../EclipseHCI'

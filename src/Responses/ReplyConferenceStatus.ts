@@ -1,3 +1,4 @@
+// @ts-nocheck
 interface ConferencePortData {
     portNumber: number;        // 0-1023 (13 bits)
     isListener: boolean;       // bit 13

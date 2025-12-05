@@ -37,7 +37,7 @@ class RequestConferenceGroupMembersEdits extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         const typeName = this.EditType === EditType.Conference ? 'Conference' : 'Group';
         return `RequestConferenceGroupMembersEdits - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, Type: ${typeName}`;
     }
@@ -55,7 +55,7 @@ class RequestConferenceGroupMembersEdits extends HCIRequest {
             : 'Request all locally edited members of fixed groups';
 
         return `Conference/Group Members Edits Request:\n` +
-            `  Message ID: 0x${this.MessageID.toString(16).padStart(4, '0')} (${this.MessageID})\n` +
+            `  Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')} (${this.RequestID})\n` +
             `  Purpose: ${typeDescription}\n` +
             `  Edit Type: ${this.EditType} (${typeName})\n` +
             `  Information Retrieved:\n` +
@@ -205,4 +205,4 @@ class RequestConferenceGroupMembersEdits extends HCIRequest {
 }
 
 export default RequestConferenceGroupMembersEdits;
-export { EditType };
+//export { EditType };

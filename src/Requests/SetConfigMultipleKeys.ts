@@ -292,7 +292,7 @@ class SetConfigMultipleKeys extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         return `SetConfigMultipleKeys - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
             `Slot: ${this.Slot}, Port: ${this.Port}, Keys: ${this.Keys.length}`;
     }

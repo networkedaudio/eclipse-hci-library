@@ -121,7 +121,7 @@ class ReplyEHXControlCardStatus {
         } else {
             console.log('No EHX control cards in response');
         }
-        console.log('=====================================');
+        console.log('displayEHXControlCardStatus=====================================');
     }
 
     // Helper methods for filtering and analysis

@@ -1,11 +1,11 @@
+
 import * as net from 'net';
 import { EventEmitter } from 'events';
 import HCIRequest from './HCIRequest';
-import HCIResponse from './HCIResponse';
 import ProcessResponse from './Responses/ProcessResponse';
 
 
-class EclipseHCI extends EventEmitter {
+export class EclipseHCI extends EventEmitter {
     private address: string;
     private connected: boolean;
     private socket: net.Socket | null;
@@ -46,12 +46,13 @@ class EclipseHCI extends EventEmitter {
         // Try ports from 52020 down to 52001
         for (let port = 52020; port >= 52001; port--) {
             try {
-                await this.tryConnect(port);
+                this.writeDebug(`EHX---Connecting to ${this.address}:${port}`);
+                this.tryConnect(port);
                 this.port = port;
-                this.writeDebug(`Connected to ${this.address}:${port}`);
+                this.writeDebug(`EHX---Connected to ${this.address}:${port}`);
                 return;
             } catch (error) {
-                this.writeDebug(`Failed to connect to port ${port}`);
+                console.error(`Failed to connect to port ${port}`);
                 continue;
             }
         }
@@ -62,23 +63,32 @@ class EclipseHCI extends EventEmitter {
 
     private tryConnect(port: number): Promise<void> {
         return new Promise((resolve, reject) => {
+            this.writeDebug(`EHX---creating socket ${this.address}\n`);
             const socket = new net.Socket();
+            socket.setTimeout(15000); // ms timeout
+            this.writeDebug(`EHX---socket created ${this.address}\n`);
+            this.writeDebug('====================================================Waiting');
+
             const timeout = setTimeout(() => {
                 socket.destroy();
-                reject(new Error(`Connection timeout on port ${port}`));
-            }, 3000); // 3 second timeout
+                reject(new Error(`EHX----Connection timeout on port ${port}`));
+            }, 12000); // mssecond timeout
 
+            this.writeDebug(`EHX---attempt to connect ${this.address},${port}\n`);
             socket.connect(port, this.address, () => {
                 clearTimeout(timeout);
                 this.socket = socket;
                 this.setupSocketHandlers();
                 resolve();
+                this.writeDebug(`EHX---resolved socket ${this.socket}\n`);
             });
 
             socket.on('error', (error) => {
                 clearTimeout(timeout);
+                this.writeDebug(`EHX---socket error ${this.socket}\n`);
                 socket.destroy();
                 reject(error);
+
             });
         });
     }
@@ -90,7 +100,7 @@ class EclipseHCI extends EventEmitter {
             // Change state to connected when receiving messages
             if (!this.connected) {
                 this.connected = true;
-                this.writeDebug(`Now receiving messages from ${this.address}:${this.port}`);
+                this.writeDebug(`EHX---Now receiving messages from ${this.address}:${this.port}`);
                 // Start queue processing when connected
                 this.startQueueProcessor();
             }
@@ -264,6 +274,10 @@ class EclipseHCI extends EventEmitter {
 
     private processMessage(message: Buffer): void {
         // Delegate to ProcessResponse class
+        this.writeDebug(
+            "← HCI Reply:",
+            message.toString('hex').match(/.{2}/g)?.join(' ') ?? message.toString('hex')
+        );
         this.processResponse.processMessage(message);
     }
 

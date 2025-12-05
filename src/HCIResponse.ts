@@ -16,6 +16,7 @@ import { ReplyCardInfo } from './Responses/ReplyCardInfo';
 import { ReplyConferenceAssignments } from './Responses/ReplyConferenceAssignments';
 import { ReplySetConfigMultipleKeys } from './Responses/ReplySetConfigMultipleKeys';
 
+
 class HCIResponse {
     public static handleMessageByID(
         messageID: number,
@@ -423,7 +424,7 @@ class HCIResponse {
         this.writeDebug(eclipseHCI, `Reserved: ${reserved.toString('hex')}`);
         this.writeDebug(eclipseHCI, `Text: "${text}"`);
         this.writeDebug(eclipseHCI, `Text length: ${text.length} characters`);
-        this.writeDebug(eclipseHCI, '=====================================');
+        this.writeDebug(eclipseHCI, 'Broadcast Message=====================================');
 
         // Emit the event if EclipseHCI instance is provided
         if (eclipseHCI && typeof eclipseHCI.emitBroadcastMessage === 'function') {

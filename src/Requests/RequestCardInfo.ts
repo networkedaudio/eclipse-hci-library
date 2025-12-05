@@ -1,7 +1,16 @@
 import HCIRequest from '../HCIRequest';
 
+function toUint8(num: number): number {
+  // Clamp the number to the valid range for an 8-bit unsigned integer (0-255)
+  const clampedNum = Math.max(0, Math.min(255, num));
+
+  // Use bitwise AND with 0xFF (binary 11111111) to ensure it's an 8-bit value
+  // and implicitly converts to an integer.
+  return clampedNum & 0xFF;
+}
+
 class RequestCardInfo extends HCIRequest {
-    public Slot: number;
+    public Slot: number ;
 
     constructor(slot: number, urgent: boolean = false, responseID?: number) {
         // Validate parameters
@@ -14,7 +23,7 @@ class RequestCardInfo extends HCIRequest {
         const payload = Buffer.allocUnsafe(1);
 
         // Slot (1 byte)
-        payload.writeUInt8(slot, 0);
+        payload.writeUInt8(toUint8(slot), 0);
 
         // Call parent constructor with Message ID 195 (0x00C3)
         super(0x00C3, payload, urgent, responseID);
@@ -29,7 +38,7 @@ class RequestCardInfo extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         return `RequestCardInfo - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, Slot: ${this.Slot}`;
     }
 

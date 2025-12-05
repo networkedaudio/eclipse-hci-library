@@ -1,3 +1,4 @@
+
 import HCIResponse from '../HCIResponse';
 
 class ProcessResponse {

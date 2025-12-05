@@ -127,7 +127,7 @@ class RequestAliasDelete extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         const aliasList = this.Aliases.length <= 3
             ? `[${this.Aliases.map(a => `S${a.system}T${a.entityType}I${a.instance}`).join(', ')}]`
             : `[${this.Aliases.slice(0, 3).map(a => `S${a.system}T${a.entityType}I${a.instance}`).join(', ')}, ...and ${this.Aliases.length - 3} more]`;

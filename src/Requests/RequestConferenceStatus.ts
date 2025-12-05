@@ -45,7 +45,7 @@ class RequestConferenceStatus extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         return `RequestConferenceStatus - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
             `Conference Number: ${this.ConferenceNumber} (0x${this.ConferenceNumber.toString(16).padStart(4, '0')})`;
     }

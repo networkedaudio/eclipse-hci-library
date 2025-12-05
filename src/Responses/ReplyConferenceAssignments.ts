@@ -154,7 +154,7 @@ class ReplyConferenceAssignments {
 
             // Summary statistics
             const stats = ReplyConferenceAssignments.getAssignmentStats(data);
-            console.log('--- Summary ---');
+            console.log('displayConferenceAssignments--- Summary ---');
             console.log(`Total Assignments: ${data.assignments.length}`);
             console.log(`Conferences with Members: ${stats.conferencesWithMembers}`);
             console.log(`Talk Enabled: ${stats.talkEnabledAssignments} | Listen Enabled: ${stats.listenEnabledAssignments}`);
@@ -177,7 +177,7 @@ class ReplyConferenceAssignments {
         } else {
             console.log('No conference assignments found');
         }
-        console.log('========================================');
+        console.log('displayConferenceAssignments========================================');
     }
 
     // Helper methods for filtering and analysis

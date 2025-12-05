@@ -17,7 +17,7 @@ class RequestEHXControlCardStatus extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         return `RequestEHXControlCardStatus - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
             `No payload (request EHX control card status)`;
     }

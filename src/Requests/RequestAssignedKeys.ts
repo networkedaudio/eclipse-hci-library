@@ -44,7 +44,7 @@ class RequestAssignedKeys extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         return `RequestAssignedKeys - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
             `Slot: ${this.Slot}, Port: ${this.Port}, Schema: ${this.ProtocolVersion}`;
     }
@@ -57,7 +57,7 @@ class RequestAssignedKeys extends HCIRequest {
     // Get description
     public getDescription(): string {
         return `Assigned Keys Request:\n` +
-            `  Message ID: 0x${this.MessageID.toString(16).padStart(4, '0')} (${this.MessageID})\n` +
+            `  Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')} (${this.RequestID})\n` +
             `  Purpose: Request all assigned key configurations for selected panel\n` +
             `  Slot: ${this.Slot} (Card slot number)\n` +
             `  Port: ${this.Port} (Port offset from first port of the card)\n` +

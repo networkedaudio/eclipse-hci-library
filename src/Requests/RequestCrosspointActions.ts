@@ -22,7 +22,7 @@ class RequestCrosspointActions extends HCIRequest {
         this.HCIVersion = 2;
 
         // Set protocol version to 2 for RequestCrosspointActions
-        this.ProtocolVersion = 2;
+        this.ProtocolVersion = 1; //changed to 1 since 2 makes HCI lite xpoint call fail
 
         this.Actions = actions;
     }
@@ -182,7 +182,7 @@ class RequestCrosspointActions extends HCIRequest {
     }
 
     // Helper method to display the request details
-    public toString(): string {
+    public override toString(): string {
         return `RequestCrosspointActions - Message ID: 0x${this.RequestID.toString(16).padStart(4, '0')}, ` +
             `Actions: ${this.Actions.length}`;
     }
